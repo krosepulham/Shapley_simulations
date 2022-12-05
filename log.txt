@@ -1,0 +1,38 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Beginning simulation with:
+nsim =  1000 
+nsamp =  50 
+beta_true =  1 1 1 1 0 0 0 0 
+...~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Beginning simulation with:
+nsim =  1000 
+nsamp =  50 
+beta_true =  1 1 1 1 0 0 0 0 
+...success!
+Simulation complete! Time elapsed:
+29.70075 
+Workspace saved at:  " Results/trivial.RData "
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Beginning simulation with:
+nsim =  1000 
+nsamp =  50 
+beta_true =  0.5 0.5 0.5 0.5 0 0 0 0 
+...success!
+Simulation complete! Time elapsed:
+29.91431 
+Workspace saved at:  " Results/half-trivial.RData "
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Beginning simulation with:
+nsim =  1000 
+nsamp =  50 
+beta_true =  1 1 1 1 0 0 0 0 
+...success!
+Simulation complete! Time elapsed:
+29.85857 
+Workspace saved at:  " Results/x-correlated.RData "
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Beginning simulation with:
+nsim =  1000 
+nsamp =  50 
+beta_true =  1 1 1 1 0 0 0 0 
+...
