@@ -1,4 +1,12 @@
 #setup##########################################################################
+library(foreach)
+library(doParallel)
+library(shapleyAIC)
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
 rm(list = ls())
 set.seed(297356865)
 AICvectors <- list()
@@ -21,16 +29,17 @@ sink()
 
 #simulation loop################################################################
 #for loop simulates the models and stores the shapley values
-for(i in 1:nsim){
-  #randomly generate explanatory covariates
-  X1 <- rnorm(nsamp)
-  X2 <- rnorm(nsamp)
-  X3 <- rnorm(nsamp)
-  X4 <- rnorm(nsamp)
-  Z1 <- rnorm(nsamp)
-  Z2 <- rnorm(nsamp)
-  Z3 <- rnorm(nsamp)
-  Z4 <- rnorm(nsamp)
+start_time = Sys.time()
+finalMatrix <- foreach(i=1:nsim, .combine=rbind) %dopar% {
+    #randomly generate explanatory covariates
+    X1 <- rnorm(nsamp)
+    X2 <- rnorm(nsamp)
+    X3 <- rnorm(nsamp)
+    X4 <- rnorm(nsamp)
+    Z1 <- rnorm(nsamp)
+    Z2 <- rnorm(nsamp)
+    Z3 <- rnorm(nsamp)
+    Z4 <- rnorm(nsamp)
 
   #put together into design matrix
   X <- cbind(X1,X2,X3,X4,Z1,Z2,Z3,Z4)
@@ -39,10 +48,37 @@ for(i in 1:nsim){
   Y <- X%*%cbind(beta_true)+rnorm(nsamp)
 
   #calculate variables shapley values
-  Yshap <- shapley(Y,X)
-  AICvectors[[i]]<- Yshap$AIC_shapleys
-  rsqvectors[[i]]<- Yshap$rsq_shapleys
+  Yshap <- shapleyAIC::shapley(Y,X)
+  #AICvectors[[i]]<- Yshap$AIC_shapleys
+  #rsqvectors[[i]]<- Yshap$rsq_shapleys
+
+  tempMatrix <- c(Yshap$AIC_shapleys,Yshap$rsq_shapleys)
+  tempMatrix #Equivalent to finalMatrix = rbind(finalMatrix, tempMatrix)
 }
+#old non-parallel code
+# #for loop simulates the models and stores the shapley values
+# for(i in 1:nsim){
+#   #randomly generate explanatory covariates
+#   X1 <- rnorm(nsamp)
+#   X2 <- rnorm(nsamp)
+#   X3 <- rnorm(nsamp)
+#   X4 <- rnorm(nsamp)
+#   Z1 <- rnorm(nsamp)
+#   Z2 <- rnorm(nsamp)
+#   Z3 <- rnorm(nsamp)
+#   Z4 <- rnorm(nsamp)
+#
+#   #put together into design matrix
+#   X <- cbind(X1,X2,X3,X4,Z1,Z2,Z3,Z4)
+#
+#   #calculate Y
+#   Y <- X%*%cbind(beta_true)+rnorm(nsamp)
+#
+#   #calculate variables shapley values
+#   Yshap <- shapley(Y,X)
+#   AICvectors[[i]]<- Yshap$AIC_shapleys
+#   rsqvectors[[i]]<- Yshap$rsq_shapleys
+# }
 end_time = Sys.time()
 sink(file="log.txt",append=TRUE,type="output")
 cat("success!\n")
@@ -51,12 +87,10 @@ sink()
 
 #post-simulation organizing#####################################################
 #store shapley values into a data frame
-AICshapleys <- matrix(unlist(AICvectors),nrow=nsim,byrow=TRUE)
-colnames(AICshapleys) <- names(AICvectors[[1]])
+AICshapleys <- finalMatrix[,1:8]
 AICshapleys <- as.data.frame(AICshapleys)
 AICshapleys$scorefn <- rep("AIC",nsim)
-rsqshapleys <- matrix(unlist(rsqvectors),nrow=nsim,byrow=TRUE)
-colnames(rsqshapleys) <- names(rsqvectors[[1]])
+rsqshapleys <- finalMatrix[,9:16]
 rsqshapleys <- as.data.frame(rsqshapleys)
 rsqshapleys$scorefn <- rep("R_Squared",nsim)
 shapleys <- dplyr::full_join(AICshapleys,rsqshapleys,by = c("X1", "X2", "X3",
